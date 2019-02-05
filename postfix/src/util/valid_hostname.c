@@ -90,6 +90,7 @@ int     valid_hostname(const char *name, int gripe)
     int     label_length = 0;
     int     label_count = 0;
     int     non_numeric = 0;
+    int     ndots = 0;
     int     ch;
 
     /*
@@ -123,6 +124,7 @@ int     valid_hostname(const char *name, int gripe)
 		return (0);
 	    }
 	    label_length = 0;
+	    ndots++;
 	} else if (ch == '-') {
 	    non_numeric = 1;
 	    label_length++;
@@ -153,9 +155,14 @@ int     valid_hostname(const char *name, int gripe)
 	return (0);
 #endif
     }
+    if (ndots < 2) {
+	if (gripe)
+	    msg_warn("%s: insufficient dots %d: %.100s", myname, ndots, name);
+	return (0);
+    }
     if (cp - name > VALID_HOSTNAME_LEN) {
 	if (gripe)
-	    msg_warn("%s: bad length %d for %.100s...",
+	    msg_warn("%s: bad length %d: %.100s",
 		     myname, (int) (cp - name), name);
 	return (0);
     }
